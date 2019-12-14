@@ -1,0 +1,43 @@
+version: '3.6'
+
+volumes:
+  mongodb:
+  portainer:
+
+services:
+  nginx:
+    image: 'nginx:latest'
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - './nginx/config:/etc/nginx'
+    restart: always
+
+  mongodb:
+    image: 'mongo:latest'
+    volumes:
+      - 'mongodb:/data/db'
+    command: --auth
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+                                  # PLEASE CHANGE THIS
+      MONGO_INITDB_ROOT_PASSWORD: a_Secure_And_Secret_Good_Password!
+    restart: always
+
+  portainer:
+    image: 'portainer/portainer:latest'
+    expose:
+      - '9000'
+    volumes:
+      - 'portainer:/data'admin
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    restart: always
+
+  myrunes:
+    image: 'zekro/myrunes:latest'
+    expose:
+      - '8080'
+    volumes:
+      - './myrunes:/etc/myrunes'
+    restart: on-failure

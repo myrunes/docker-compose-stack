@@ -1,0 +1,13 @@
+mongodb:
+  auth_db:  admin
+  data_db:  lol-runes
+  host:     mongodb
+  username: admin
+            # PLEASE CHANGE THIS
+  password: a_Secure_And_Secret_Good_Password!
+  port:     27017
+
+webserver:
+  addr: myrunes:8080
+  tls:
+    enabled: false
