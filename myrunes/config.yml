@@ -8,6 +8,14 @@ mongodb:
   port:     27017
 
 webserver:
-  addr: myrunes:8080
+  addr:          myrunes-backend:8080
+  publicaddress: http://localhost
+  enablecors:    false
   tls:
     enabled: false
+
+mailserver:
+  host:     smtp.mailservice.com
+  port:     465
+  username: webmaster@mailservice.com
+  password: your_mail_server_password
