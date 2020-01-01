@@ -30,14 +30,20 @@ services:
     expose:
       - '9000'
     volumes:
-      - 'portainer:/data'admin
+      - 'portainer:/data'
       - '/var/run/docker.sock:/var/run/docker.sock'
     restart: always
 
-  myrunes:
-    image: 'zekro/myrunes:latest'
+  myrunes-backend:
+    image: 'myrunes/backend:latest'
     expose:
       - '8080'
     volumes:
       - './myrunes:/etc/myrunes'
+    restart: on-failure
+
+  myrunes-frontend:
+    image: 'myrunes/frontend:latest'
+    expose:
+      - '8080'
     restart: on-failure
