@@ -7,15 +7,21 @@ mongodb:
   password: a_Secure_And_Secret_Good_Password!
   port:     27017
 
+redis:
+  enabled: false
+  addr:    'redis:6379'
+  db: 0
+  password: ""
+
 webserver:
-  addr:          myrunes-backend:8080
-  publicaddress: http://localhost
+  addr:          'myrunes-backend:8080'
+  publicaddress: 'http://localhost'
   enablecors:    false
   tls:
     enabled: false
 
 mailserver:
-  host:     smtp.mailservice.com
+  host:     'smtp.mailservice.com'
   port:     465
-  username: webmaster@mailservice.com
-  password: your_mail_server_password
+  username: 'webmaster@mailservice.com'
+  password: 'your_mail_server_password'
