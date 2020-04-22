@@ -10,8 +10,7 @@ mongodb:
 redis:
   enabled: false
   addr:    'redis:6379'
-  db: 0
-  password: ""
+  db:      0
 
 webserver:
   addr:          'myrunes-backend:8080'
