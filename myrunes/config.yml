@@ -3,7 +3,6 @@ mongodb:
   data_db:  lol-runes
   host:     mongodb
   username: admin
-            # PLEASE CHANGE THIS
   password: a_Secure_And_Secret_Good_Password!
   port:     27017
 
@@ -13,7 +12,7 @@ redis:
   db:      0
 
 webserver:
-  addr:          'myrunes-backend:8080'
+  addr:          ':8080'
   publicaddress: 'http://localhost'
   enablecors:    false
   tls:
@@ -24,3 +23,12 @@ mailserver:
   port:     465
   username: 'webmaster@mailservice.com'
   password: 'your_mail_server_password'
+
+storage:
+  type: minio
+  minio:
+    endpoint:      'minio'
+    access_key:    'minio_access_key'
+    access_secret: 'minio_access_secret'
+    location:      'us-east-1'
+    secure:        true

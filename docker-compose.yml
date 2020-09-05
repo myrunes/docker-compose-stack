@@ -2,21 +2,28 @@ version: '3.7'
 
 volumes:
   mongodb:
-  portainer:
+  minio:
 
 services:
-  # NGINX as reverse proxy for REST API
-  ä and front end
-  nginx:
-    image: 'nginx:latest'
+  traefik:
+    image: traefik:v2.2
+    command: 
+      - '--api.insecure=true' 
+      - '--providers.docker'
+      - '--providers.file.directory=/etc/traefik/dynamic_conf'
+      - '--entrypoints.http.address=:80'
+      - '--entrypoints.https.address=:443'
+      - '--providers.docker.exposedByDefault=false'
     ports:
       - '80:80'
       - '443:443'
+      - '8080:8080'
     volumes:
-      - './nginx/config:/etc/nginx'
+      - './traefik/dynamic_conf:/etc/traefik/dynamic_conf'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '/etc/certs:/etc/certs:ro'
     restart: always
 
-  # Main MongoDB database
   mongodb:
     image: 'mongo:latest'
     volumes:
@@ -24,49 +31,45 @@ services:
     command: --auth
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
-                                  # PLEASE CHANGE THIS
       MONGO_INITDB_ROOT_PASSWORD: a_Secure_And_Secret_Good_Password!
     restart: always
 
-  # Redis as database cahce
-  redis:
-    image: 'redis:latest'
+  minio:
+    image: 'minio/minio:latest'
     expose:
-      - '6379'
+      - '9000'
+    volumes:
+      - 'minio:/data'
+    environment:
+      MINIO_ACCESS_KEY:    'minio_access_key'
+      MINIO_SECRET_KEY:    'minio_secret_key'
+      MINIO_REGION_NAME:   'us-east-1'
+    command: server /data
     restart: always
 
-  # myrunes REST API and database bindings
-  myrunes-backend:
+  myrunes-be:
     image: 'myrunes/backend:latest'
     expose:
-      - '8080'
+      - '9000'
     volumes:
       - './myrunes:/etc/myrunes'
-    restart: on-failure
+    restart: always
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.myrunes-be.entrypoints=https'
+      - 'traefik.http.routers.myrunes-be.tls=true'
+      - 'traefik.http.routers.myrunes-be.rule=PathPrefix(`/api`)'
+      - 'traefik.http.routers.myrunes-be.middlewares=myrunes-be-stripprefix'
+      - 'traefik.http.middlewares.myrunes-be-stripprefix.stripprefix.prefixes=/api'
 
-  # myrunes frontend file server
-  myrunes-frontend:
+  myrunes-fe:
     image: 'myrunes/frontend:latest'
     expose:
       - '8080'
     restart: on-failure
-    
-    portainer:
-    image: 'portainer/portainer:latest'
-    expose:
-      - '9000'
-    volumes:
-      - 'portainer:/data'
-      - '/var/run/docker.sock:/var/run/docker.sock'
-    restart: always
-    
-  # OPTIONAL:
-  # Portainer as container management frontend
-  portainer:
-    image: 'portainer/portainer:latest'
-    expose:
-      - '9000'
-    volumes:
-      - 'portainer:/data'
-      - '/var/run/docker.sock:/var/run/docker.sock'
-    restart: always
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.myrunes-fe.entrypoints=https'
+      - 'traefik.http.routers.myrunes-fe.tls=true'
+      - 'traefik.http.routers.myrunes-fe.rule=PathPrefix(`/`)'
+      - 'traefik.http.services.myrunes-fe.loadbalancer.server.port=8080'
